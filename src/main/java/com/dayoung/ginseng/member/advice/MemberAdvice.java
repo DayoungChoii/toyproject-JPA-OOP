@@ -16,6 +16,6 @@ public class MemberAdvice {
     public ModelAndView MemberExceptionHandle(MemberException e) {
         HashMap<String, String> modelMap = new HashMap<>();
         modelMap.put("errorMsg", e.getMessage());
-        return new ModelAndView("member/memberTryAgain", modelMap);
+        return new ModelAndView("members/memberTryAgain", modelMap);
     }
 }

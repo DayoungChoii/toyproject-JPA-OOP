@@ -1,25 +1,25 @@
 package com.dayoung.ginseng.member.controller;
 
-import com.dayoung.ginseng.file.domain.UploadFile;
-import com.dayoung.ginseng.file.service.FileDBService;
-import com.dayoung.ginseng.file.service.FileService;
-import com.dayoung.ginseng.file.util.FileUtil;
+import com.dayoung.ginseng.member.domain.MemberLoginForm;
+import com.dayoung.ginseng.member.domain.MemberRegisterForm;
 import com.dayoung.ginseng.member.domain.MemberVo;
-import com.dayoung.ginseng.member.domain.MemberForm;
-import com.dayoung.ginseng.member.exception.RegisterException;
+import com.dayoung.ginseng.member.exception.EncryptAlgorithmFailException;
+import com.dayoung.ginseng.member.exception.MemberException;
 import com.dayoung.ginseng.member.service.MemberService;
-import com.dayoung.ginseng.member.util.SHA256;
+import com.dayoung.ginseng.session.SessionConst;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
-import java.util.UUID;
 
 @Slf4j
 @Controller
@@ -28,6 +28,7 @@ import java.util.UUID;
 public class MemberController {
 
     private final MemberService memberService;
+    private final MessageSource ms;
 
 
     /**
@@ -36,8 +37,8 @@ public class MemberController {
      * @return
      */
     @GetMapping("/login")
-    public String loginView() {
-        return "member/login";
+    public String loginView(@ModelAttribute(name="memberLoginForm")MemberLoginForm loginForm) {
+        return "members/login";
     }
 
     /**
@@ -49,13 +50,31 @@ public class MemberController {
      * @return
      */
     @PostMapping("/login")
-    public String login(@ModelAttribute MemberForm memberForm) {
-        MemberVo memberVo = new MemberVo();
-        memberForm.setId(memberVo.getId());
-        memberForm.setPassword(memberVo.getPassword());
-        memberForm.setNickname(memberVo.getNickname());
+    public String login(@Validated @ModelAttribute MemberLoginForm memberLoginForm
+            , BindingResult bindingResult, HttpServletRequest request) {
 
-        return "main/dashboard";
+        if(bindingResult.hasErrors()){
+            return "members/login";
+        }
+
+        MemberVo loginMember;
+        try {
+            loginMember = memberService.login(memberLoginForm.getId(), memberLoginForm.getPassword());
+        } catch (EncryptAlgorithmFailException e) {
+            log.info("password encrypt fail, userId ={}", memberLoginForm.getId());
+            throw new MemberException(ms.getMessage("failToLogin", null, null));
+        }
+
+        if (loginMember == null) {
+            bindingResult.reject("idPasswordMismatch");
+            return "members/login";
+        }
+
+        HttpSession session = request.getSession();
+        session.setAttribute(SessionConst.ID, loginMember.getId());
+        session.setAttribute(SessionConst.MEMBER_ID, loginMember.getMemberId());
+
+        return "redirect:/";
     }
 
     /**
@@ -64,8 +83,8 @@ public class MemberController {
      * @return
      */
     @GetMapping("/register")
-    public String registerView(@ModelAttribute("memberForm") MemberForm memberForm) {
-        return "member/register";
+    public String registerView(@ModelAttribute("memberRegisterForm") MemberRegisterForm registerForm) {
+        return "members/register";
     }
 
     /**
@@ -85,12 +104,12 @@ public class MemberController {
         }
  
         if (bindingResult.hasErrors()) {
-            return "member/register";
+            return "members/register";
         }
 
         try {
             memberService.register(registerForm, profileFile);
-        } catch (NoSuchAlgorithmException e) {
+        } catch (EncryptAlgorithmFailException e) {
             log.info("password encrypt fail, userId ={}", registerForm.getId());
             throw new MemberException(ms.getMessage("failToRegist", null, null));
         } catch (IOException e) {
@@ -98,7 +117,7 @@ public class MemberController {
             throw new MemberException(ms.getMessage("failToRegist", null, null));
         }
 
-        return "redirect:/member/successedRegister";
+        return "redirect:/members/successedRegister";
     }
 
     /**
@@ -106,7 +125,7 @@ public class MemberController {
      */
     @GetMapping("/successedRegister")
     public String successedRegisterView(){
-        return "member/successedRegister";
+        return "members/successedRegister";
     }
 
 }

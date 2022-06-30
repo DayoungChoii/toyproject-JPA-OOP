@@ -1,12 +1,21 @@
 package com.dayoung.ginseng.member.util;
 
+import com.dayoung.ginseng.member.exception.EncryptAlgorithmFailException;
+import org.springframework.stereotype.Component;
+
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-public class SHA256 {
-    public static String encrypt(String text) throws NoSuchAlgorithmException {
-        MessageDigest md = MessageDigest.getInstance("SHA-256");
-        md.update(text.getBytes());
+@Component
+public class SHA256 implements EncryptAlgorithm {
+    public String encrypt(String text) {
+        MessageDigest md;
+        try{
+            md = MessageDigest.getInstance("SHA-256");
+            md.update(text.getBytes());
+        } catch(NoSuchAlgorithmException e){
+            throw new EncryptAlgorithmFailException(e);
+        }
 
         return bytesToHex(md.digest());
     }

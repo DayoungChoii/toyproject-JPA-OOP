@@ -6,12 +6,13 @@ import com.dayoung.ginseng.file.service.FileService;
 import com.dayoung.ginseng.file.util.FileUtil;
 import com.dayoung.ginseng.member.domain.MemberRegisterForm;
 import com.dayoung.ginseng.member.domain.MemberVo;
+import com.dayoung.ginseng.member.exception.EncryptAlgorithmFailException;
 import com.dayoung.ginseng.member.repository.MemberDao;
+import com.dayoung.ginseng.member.util.EncryptAlgorithm;
 import com.dayoung.ginseng.member.util.SHA256;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -26,18 +27,18 @@ public class MemberServiceImpl implements MemberService {
     private final MemberDao memberDao;
     private final FileService fileService;
     private final FileDBService fileDBService;
+    private final EncryptAlgorithm encryptAlgorithm;
 
     @Override
-    public MemberVo login(String id, String password) throws NoSuchAlgorithmException {
-        MemberVo member = new MemberVo(id, SHA256.encrypt(password));
+    public MemberVo login(String id, String password) throws EncryptAlgorithmFailException {
+        MemberVo member = new MemberVo(id, encryptAlgorithm.encrypt(password));
         MemberVo loginMember = memberDao.selectMemberByIdAndPassword(member);
 
         return loginMember == null ? null : loginMember;
     }
 
     @Override
-    @Transactional
-    public void register(MemberRegisterForm memberRegisterForm, MultipartFile profileFile) throws NoSuchAlgorithmException, IOException {
+    public void register(MemberRegisterForm memberRegisterForm, MultipartFile profileFile) throws IOException {
         MemberVo memberVo = new MemberVo();
         setVoFromForm(memberRegisterForm, memberVo);
 
@@ -56,10 +57,10 @@ public class MemberServiceImpl implements MemberService {
         return memberVo == null ? false : true;
     }
 
-    private void setVoFromForm(MemberRegisterForm memberRegisterForm, MemberVo memberVo) throws NoSuchAlgorithmException {
+    private void setVoFromForm(MemberRegisterForm memberRegisterForm, MemberVo memberVo) throws EncryptAlgorithmFailException {
         memberVo.setMemberId("M" + UUID.randomUUID().toString());
         memberVo.setId(memberRegisterForm.getId());
         memberVo.setNickname(memberRegisterForm.getNickname());
-        memberVo.setPassword(SHA256.encrypt(memberRegisterForm.getPassword()));
+        memberVo.setPassword(encryptAlgorithm.encrypt(memberRegisterForm.getPassword()));
     }
 }
