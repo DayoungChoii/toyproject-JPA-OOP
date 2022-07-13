@@ -111,10 +111,10 @@ public class MemberController {
             memberService.register(registerForm, profileFile);
         } catch (EncryptAlgorithmFailException e) {
             log.info("password encrypt fail, userId ={}", registerForm.getId());
-            throw new MemberException(ms.getMessage("failToRegist", null, null));
+            throw new MemberException(ms.getMessage("failToRegist", null, null), e);
         } catch (IOException e) {
             log.info("profile file upload fail, userId ={}", registerForm.getId());
-            throw new MemberException(ms.getMessage("failToRegist", null, null));
+            throw new MemberException(ms.getMessage("failToRegist", null, null), e);
         }
 
         return "redirect:/members/successedRegister";
