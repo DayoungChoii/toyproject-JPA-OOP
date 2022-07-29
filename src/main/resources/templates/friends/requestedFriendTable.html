@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<div class="card-body" id="requestedFriendTable">
+    <div class="table-responsive">
+        <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+            <thead>
+            <tr>
+                <th th:text="#{text.friend.nicknam}">Name</th>
+                <th th:text="#{text.friend.id}">Position</th>
+                <th th:text="#{text.friend.requestaccept}"></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="friend : ${requestedFriends}">
+                <td th:text="${friend.nickname}"></td>
+                <td id="friendId" th:text="${friend.id}"></td>
+                <td><button class="btn btn-primary" name="acceptFriend" th:text="#{button.friend.accept}">승낙</button></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</html>

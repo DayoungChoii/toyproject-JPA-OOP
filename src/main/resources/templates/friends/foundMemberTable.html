@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<div class="card-body" id="foundFriendTable">
+    <div class="table-responsive">
+        <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+            <thead>
+            <tr>
+                <th th:text="#{text.friend.nicknam}">Name</th>
+                <th th:text="#{text.friend.id}">Position</th>
+                <th th:text="#{text.friend.requestfriend}">Follow</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="friend : ${foundFriends}">
+                <td th:text="${friend.nickname}"></td>
+                <td id="friendId" th:text="${friend.id}"></td>
+                <td><button class="btn btn-primary" name="requestFriend" th:text="#{button.friend.requestfriend}">친구신청</button></td>
+           </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</html>

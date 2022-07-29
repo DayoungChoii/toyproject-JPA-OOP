@@ -19,7 +19,7 @@ public class PortalController {
         if(session == null){
             HashMap<String, MemberLoginForm> modelMap = new HashMap<>();
             modelMap.put("memberLoginForm", new MemberLoginForm());
-            return new ModelAndView("member/login", modelMap);
+            return new ModelAndView("members/login", modelMap);
         }
 
         //세션이 있으면 대쉬보드

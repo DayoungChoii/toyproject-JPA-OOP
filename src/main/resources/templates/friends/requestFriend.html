@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+
+<th:block layout:fragment="content">
+    <!-- Begin Page Content -->
+    <div class="container-fluid">
+        <!-- Page Heading -->
+        <h1 class="h3 mb-2 text-gray-800" th:text="#{subject.friend.findfriend}">친구 찾기</h1>
+            <div class="input-group">
+                <input type="text" class="form-control border-0 small" id="friendId"
+                       placeholder="Search for..." aria-label="Search" aria-describedby="basic-addon2">
+                <div class="input-group-append">
+                    <button id="search" class="btn btn-primary" type="button">
+                        <i class="fas fa-search fa-sm"></i>
+                    </button>
+                </div>
+            </div>
+        <hr/>
+        <!-- DataTales Example -->
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary" th:text="#{subject.friend.findfriend}">DataTables Example</h6>
+            </div>
+            <div class="card-body" id="memberListContent">
+            </div>
+        </div>
+
+    </div>
+    <!-- /.container-fluid -->
+    <!-- Content Row -->
+
+
+</th:block>
+<th:block layout:fragment="script">
+    <script type="text/javascript">
+        $('#search').on('click', onSearch);
+        $('#memberListContent').on('click', '[name=requestFriend]',function(){onRequestFriend($(this))});
+
+        function getMemberList(friendId) {
+            $.ajax({
+                type: "POST",
+                url: "/friends/find/" + friendId,
+                // data: {'friendId': friendId},
+                // dataType: "text"
+            })
+                .done(function (result) {
+                    //받은 값이 렌더링 된 화면
+                    console.log(result);
+                    $("#memberListContent").children().remove();
+                    $("#memberListContent").append(result);
+                })
+                .fail(function (jqXHR) {
+                    console.log(jqXHR);
+                })
+        }
+
+        function requestFriend(friendId) {
+            $.ajax({
+                type: "POST",
+                url: "/friends/request/" + friendId,
+                // data: {'friendId': friendId},
+                // dataType: "text"
+            })
+                .done(function (result) {
+                    //받은 값이 렌더링 된 화면
+                    alert(result);
+                    onSearch();
+
+                })
+                .fail(function (msg) {
+                    alert(msg)
+                })
+        }
+
+        function onSearch() {
+            getMemberList($('#friendId').val());
+        }
+
+        function onRequestFriend($this) {
+            debugger;
+            requestFriend($this.closest('tr').find('#friendId').text());
+        }
+    </script>
+</th:block>
+</html>

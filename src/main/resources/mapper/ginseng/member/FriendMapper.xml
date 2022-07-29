@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dayoung.ginseng.friend.repository.MybatisFriendMapper">
+    <insert id="requestFriend" parameterType="com.dayoung.ginseng.friend.domain.FriendVo">
+        INSERT INTO friend_relation (my_member_id, friend_member_id, status)
+        VALUES (#{myMemberId},
+                (select member_id from `member` where id = #{friendId}),
+                #{status})
+    </insert>
+
+    <select id="findMember" parameterType="String"  resultType="com.dayoung.ginseng.member.domain.MemberVo">
+        select id, nickname
+        from `member` m
+        where member_id not in (select friend_member_Id from friend_relation fr where my_member_id = #{myMemberId})
+        and id like CONCAT('%',#{friendId},'%')
+    </select>
+
+    <select id="findMyFriendsByStatus" parameterType="com.dayoung.ginseng.friend.domain.FriendVo"  resultType="com.dayoung.ginseng.member.domain.MemberVo">
+        select m.id, m.nickname
+        from friend_relation fr
+            left join member m
+            on fr.friend_member_id = m.member_id
+        where fr.my_member_id = #{myMemberId}
+          and fr.status = #{status}
+    </select>
+
+    <select id="findRequestedFriend" parameterType="com.dayoung.ginseng.member.domain.MemberVo"  resultType="com.dayoung.ginseng.member.domain.MemberVo">
+        select m.id, m.nickname
+        from friend_relation fr
+            left join member m
+            on fr.my_member_id = m.member_id
+        where fr.friend_member_id = #{myMemberId}
+          and fr.status = #{status}
+    </select>
+
+    <update id="acceptFriend" parameterType="com.dayoung.ginseng.friend.domain.FriendVo">
+        update friend_relation
+        set status = #{status}
+        where friend_member_id  = #{myMemberId}
+        and my_member_id = (select member_id from member where id = #{friendId})
+    </update>
+</mapper>

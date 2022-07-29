@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+
+<th:block layout:fragment="content">
+    <!-- Begin Page Content -->
+    <div class="container-fluid">
+        <!-- Page Heading -->
+        <h1 class="h3 mb-2 text-gray-800" th:text="#{subject.friend.requestedFriend}">받은 신청</h1>
+        <hr/>
+        <!-- DataTales Example -->
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary" th:text="#{subject.friend.requestedFriend}">DataTables Example</h6>
+            </div>
+            <div class="card-body" id="requestedFriendsList">
+            </div>
+        </div>
+
+    </div>
+    <!-- /.container-fluid -->
+    <!-- Content Row -->
+
+
+</th:block>
+<th:block layout:fragment="script">
+    <script type="text/javascript">
+        $('#requestedFriendsList').on('click', '[name=acceptFriend]',function(){onAcceptFriend($(this))});
+        getRequestedFriendList();
+
+        //처음 화면 로딩할 때 테이블이 그려져야함
+        function getRequestedFriendList() {
+            $.ajax({
+                type: "POST",
+                url: "/friends/requested",
+            })
+                .done(function (result) {
+                    //받은 값이 렌더링 된 화면
+                    console.log(result);
+                    $("#requestedFriendsList").children().remove();
+                    $("#requestedFriendsList").append(result);
+                })
+                .fail(function (msg) {
+                    console.log(msg);
+                })
+        }
+
+        //이벤트 성공 뒤 테이블 다시 로드되야함
+        function onAcceptFriend($this) {
+            var friendId = $this.closest('tr').find('#friendId').text();
+            $.ajax({
+                type: "POST",
+                url: "/friends/requested/" + friendId,
+            })
+                .done(function (result) {
+                    //받은 값이 렌더링 된 화면
+                    alert(result);
+                    getRequestedFriendList();
+
+                })
+                .fail(function (msg) {
+                    alert(msg)
+                })
+        }
+    </script>
+</th:block>
+</html>
