@@ -8,6 +8,8 @@ CREATE TABLE `member` (
   `member_id` varchar(50) NOT NULL,
   PRIMARY KEY (`member_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+create index member_id01 on member (id ASC);
+create index member_id02 on member (id, password ASC);
 
 
 /**
@@ -20,7 +22,7 @@ CREATE TABLE `cmm_file` (
   `target_id` char(50) NOT NULL,
   PRIMARY KEY (`local_file_name`,`target_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
+create index file_id01 on cmm_file (target_id ASC);
 
 /**
 * 산삼메시지 테이블 생성
@@ -43,6 +45,8 @@ CREATE TABLE `friend_relation` (
   `status` char(1) NOT NULL,
   PRIMARY KEY (`my_member_id`,`friend_member_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+create index friend_id01 on friend_relation (my_member_id ASC);
+create index friend_id02 on friend_relation (friend_member_id ASC);
 
 /**
 * 메시지 요청 테이블
