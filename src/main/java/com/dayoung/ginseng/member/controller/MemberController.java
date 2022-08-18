@@ -50,7 +50,7 @@ public class MemberController {
      * @return
      */
     @PostMapping("/login")
-    public String login(@Validated @ModelAttribute MemberLoginForm memberLoginForm
+    public String login(@Validated @ModelAttribute MemberLoginForm memberLoginForm, @RequestParam(defaultValue = "/") String redirectURL
             , BindingResult bindingResult, HttpServletRequest request) {
 
         if(bindingResult.hasErrors()){
@@ -74,7 +74,7 @@ public class MemberController {
         session.setAttribute(SessionConst.ID, loginMember.getId());
         session.setAttribute(SessionConst.MEMBER_ID, loginMember.getMemberId());
 
-        return "redirect:/";
+        return "redirect:" + redirectURL;
     }
 
     /**
