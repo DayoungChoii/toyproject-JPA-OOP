@@ -30,7 +30,7 @@ create index file_id01 on cmm_file (target_id ASC);
 CREATE TABLE `message` (
   `message_id` char(20) NOT NULL,
   `sender_id` char(20) NOT NULL,
-  `reciever_id` char(20) NOT NULL,
+  `receiver_id` char(20) NOT NULL,
   `reg_date` timestamp(6) NOT NULL DEFAULT current_timestamp(6) ON UPDATE current_timestamp(6),
   PRIMARY KEY (`message_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
