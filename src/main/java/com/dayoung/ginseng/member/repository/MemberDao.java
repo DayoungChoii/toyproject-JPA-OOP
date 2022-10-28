@@ -7,10 +7,10 @@ import java.util.Optional;
 
 public interface MemberDao {
 
-    void save(Member member);
+    Member save(Member member);
 
     Optional<Member> findMemberByID(String id);
 
-    Optional<Member> findMemberByPasswordAndId(Member member);
+    Optional<Member> findMemberByPasswordAndId(String id, String password);
 }
 

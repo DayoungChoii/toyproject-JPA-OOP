@@ -16,8 +16,9 @@ public class MemberRepository implements MemberDao {
     private final EntityManager em;
 
     @Override
-    public void save(Member member) {
+    public Member save(Member member) {
         em.persist(member);
+        return member;
     }
 
     @Override
@@ -31,10 +32,10 @@ public class MemberRepository implements MemberDao {
     }
 
     @Override
-    public Optional<Member> findMemberByPasswordAndId(Member member) {
+    public Optional<Member> findMemberByPasswordAndId(String id, String password) {
         return em.createQuery("select m from Member m where m.id = :id and m.password = :password")
-                .setParameter("id", member.getId())
-                .setParameter("password", member.getPassword())
+                .setParameter("id", id)
+                .setParameter("password", password)
                 .getResultList()
                 .stream()
                 .findAny();

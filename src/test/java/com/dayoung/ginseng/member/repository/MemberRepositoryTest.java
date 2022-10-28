@@ -51,11 +51,13 @@ class MemberRepositoryTest {
     @Test
     public void 회원_아이디와_비밀번호로_찾기() throws Exception{
         //given
-        Member member = new Member("M123456789", "choi1234", "maxx","1234");
+        String id = "choi1234";
+        String password = "1234";
+        Member member = new Member("M123456789", id, "maxx",password);
         memberRepository.save(member);
 
         //when
-        Member foundMember = memberRepository.findMemberByPasswordAndId(member).get();
+        Member foundMember = memberRepository.findMemberByPasswordAndId(id, password).get();
 
         //then
         assertThat(member).isEqualTo(foundMember);
