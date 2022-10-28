@@ -12,6 +12,7 @@ spring:
       hibernate:
         #   show_sql: true systemout으로 나옴
         format_sql: true
+    show-sql: true
 
 logging.level:
   org.hibernate.SQL: debug
