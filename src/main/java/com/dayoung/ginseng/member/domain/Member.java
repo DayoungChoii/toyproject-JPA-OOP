@@ -21,10 +21,7 @@ public class Member {
     private String nickname;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumns(value = {
-            @JoinColumn(name = "tartget_id"),
-            @JoinColumn(name = "local_file_name")
-    })
+    @JoinColumn(name = "file_id")
     private UploadFile uploadFile;
 
     public Member(String id, String password) {
@@ -38,5 +35,9 @@ public class Member {
         this.id = id;
         this.nickname = nickname;
         this.password = password;
+    }
+
+    public void setUploadFile(UploadFile uploadFile) {
+        this.uploadFile = uploadFile;
     }
 }
