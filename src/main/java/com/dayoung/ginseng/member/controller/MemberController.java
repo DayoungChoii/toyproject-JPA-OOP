@@ -2,7 +2,7 @@ package com.dayoung.ginseng.member.controller;
 
 import com.dayoung.ginseng.member.domain.MemberLoginForm;
 import com.dayoung.ginseng.member.domain.MemberRegisterForm;
-import com.dayoung.ginseng.member.domain.MemberVo;
+import com.dayoung.ginseng.member.domain.Member;
 import com.dayoung.ginseng.member.exception.EncryptAlgorithmFailException;
 import com.dayoung.ginseng.member.exception.MemberException;
 import com.dayoung.ginseng.member.service.MemberService;
@@ -18,8 +18,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import javax.swing.text.html.Option;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
+import java.util.Optional;
 
 @Slf4j
 @Controller
@@ -50,14 +52,14 @@ public class MemberController {
      * @return
      */
     @PostMapping("/login")
-    public String login(@Validated @ModelAttribute MemberLoginForm memberLoginForm, @RequestParam(defaultValue = "/") String redirectURL
-            , BindingResult bindingResult, HttpServletRequest request) {
+    public String login(@RequestParam(defaultValue = "/") String redirectURL, @Validated @ModelAttribute MemberLoginForm memberLoginForm,
+            BindingResult bindingResult, HttpServletRequest request) {
 
         if(bindingResult.hasErrors()){
             return "members/login";
         }
 
-        MemberVo loginMember;
+        Optional<Member> loginMember;
         try {
             loginMember = memberService.login(memberLoginForm.getId(), memberLoginForm.getPassword());
         } catch (EncryptAlgorithmFailException e) {
@@ -65,14 +67,14 @@ public class MemberController {
             throw new MemberException(ms.getMessage("failToLogin", null, null));
         }
 
-        if (loginMember == null) {
+        if (loginMember.isEmpty()) {
             bindingResult.reject("idPasswordMismatch");
             return "members/login";
         }
 
         HttpSession session = request.getSession();
-        session.setAttribute(SessionConst.ID, loginMember.getId());
-        session.setAttribute(SessionConst.MEMBER_ID, loginMember.getMemberId());
+        session.setAttribute(SessionConst.ID, loginMember.get().getId());
+        session.setAttribute(SessionConst.MEMBER_ID, loginMember.get().getMemberId());
 
         return "redirect:" + redirectURL;
     }
