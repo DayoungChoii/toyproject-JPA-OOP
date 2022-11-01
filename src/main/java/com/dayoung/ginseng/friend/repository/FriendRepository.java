@@ -1,18 +1,50 @@
 package com.dayoung.ginseng.friend.repository;
 
-import com.dayoung.ginseng.friend.domain.FriendVo;
-import com.dayoung.ginseng.member.domain.MemberVo;
+import com.dayoung.ginseng.friend.domain.FriendRelation;
+import com.dayoung.ginseng.member.domain.Member;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Repository;
 
+import javax.persistence.EntityManager;
 import java.util.List;
 
-public interface FriendRepository {
-    List<MemberVo> findMember(FriendVo friendId);
+@Repository
+@RequiredArgsConstructor
+public class FriendRepository {
 
-    void requestFriend(FriendVo friendVo);
+    private final EntityManager em;
 
-    List<FriendVo> findMyFriendsByStatus(FriendVo myMemberId);
+    public List<Member> findNonFriendMemberByIds(String myId, String friendId) { //jpql
+        return em.createQuery("select m " +
+                                        "from Member m " +
+                                        "where m.id not in (select f.me.id from FriendRelation f where f.me.id = :myId) " +
+                                        "and m.id like concat('%', :friendId, '%') ", Member.class)
+                .setParameter("myId", myId)
+                .setParameter("friendId", friendId)
+                .getResultList();
+    }
 
-    List<FriendVo> findRequestedFriend(FriendVo myMemberId);
+    public FriendRelation saveFriendRelation(FriendRelation friendRelation) {
+        em.persist(friendRelation);
+        return friendRelation;
+    }
 
-    int acceptFriend(FriendVo myId);
+    public List<FriendRelation> findMyFriendRelationsByStatus(String myId, String status) {
+        return em.createQuery("select fr from FriendRelation fr join fetch fr.friend where fr.me.id = :myId and fr.status = :status", FriendRelation.class)
+                .setParameter("myId", myId)
+                .setParameter("status", status)
+                .getResultList();
+
+    }
+
+    public List<FriendRelation> findRequestedFriend(String myId, String status) {
+        return em.createQuery("select fr from FriendRelation fr join fetch fr.friend where fr.friend.id = :myId and fr.status = :status", FriendRelation.class)
+                .setParameter("myId", myId)
+                .setParameter("status", status)
+                .getResultList();
+    }
+
+    public FriendRelation findOne(Long id){
+        return em.find(FriendRelation.class, id);
+    }
 }
