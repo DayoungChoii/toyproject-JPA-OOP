@@ -47,4 +47,13 @@ public class FriendRepository {
     public FriendRelation findOne(Long id){
         return em.find(FriendRelation.class, id);
     }
+
+    public FriendRelation findOneByIds(String myId, String friendId){
+        return em.createQuery("select fr from FriendRelation fr where fr.me.id = :myId and fr.friend.id = :friendId", FriendRelation.class)
+                    .setParameter("myId", myId)
+                    .setParameter("friendId", friendId)
+                    .getResultList()
+                    .stream()
+                    .findAny().get();
+    }
 }
