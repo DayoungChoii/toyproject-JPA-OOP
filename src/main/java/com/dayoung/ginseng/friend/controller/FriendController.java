@@ -1,8 +1,8 @@
 package com.dayoung.ginseng.friend.controller;
 
-import com.dayoung.ginseng.friend.domain.FriendVo;
+import com.dayoung.ginseng.friend.domain.FriendRelation;
 import com.dayoung.ginseng.friend.service.FriendService;
-import com.dayoung.ginseng.member.domain.MemberVo;
+import com.dayoung.ginseng.member.domain.Member;
 import com.dayoung.ginseng.session.SessionConst;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -12,6 +12,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.util.List;
 
@@ -41,11 +42,14 @@ public class FriendController {
      */
     @PostMapping("/request/{friendId}")
     @ResponseBody
-    public String requestFriend(@PathVariable String friendId, HttpServletRequest request) {
+    public String requestFriend(@PathVariable String friendId, HttpServletRequest request, HttpServletResponse response) {
         HttpSession session = request.getSession();
-        Object myMemberId = session.getAttribute(SessionConst.MEMBER_ID);
+        Object myId = session.getAttribute(SessionConst.ID);
+
+        response.setContentType("text/plain");
+        response.setCharacterEncoding("UTF-8");
         try {
-            friendService.requestFriend(friendId, (String) myMemberId);
+            friendService.requestFriend(friendId, (String) myId);
             return ms.getMessage("msg.friend.requestsuccess", null, null);
         } catch (Exception e) {
             log.info("REQUEST FRIEND FAIL: " + e);
@@ -63,10 +67,10 @@ public class FriendController {
     @PostMapping("/finds/{friendId}")
     public String findMember(@PathVariable String friendId, Model model, HttpServletRequest request) {
         HttpSession session = request.getSession();
-        Object myMemberId = session.getAttribute(SessionConst.MEMBER_ID);
-        List<MemberVo> foundFriends = friendService.findMember((String)myMemberId, friendId);
+        Object myId = session.getAttribute(SessionConst.ID);
+        List<Member> foundFriends = friendService.searchNonFriends((String)myId, friendId);
         model.addAttribute("foundFriends", foundFriends);
-        return "friend/foundMemberTable";
+        return "friends/foundMemberTable";
     }
 
     /**
@@ -78,8 +82,8 @@ public class FriendController {
     @GetMapping("/my")
     public String myFriendView(Model model, HttpServletRequest request) {
         HttpSession session = request.getSession();
-        Object myMemberId = session.getAttribute(SessionConst.MEMBER_ID);
-        List<FriendVo> myFriends = friendService.findMyFriendAll((String) myMemberId);
+        Object myId = session.getAttribute(SessionConst.ID);
+        List<Member> myFriends = friendService.findMyFriendAll((String) myId);
         model.addAttribute("myFriends", myFriends);
         return "friends/myFriend";
     }
@@ -103,8 +107,8 @@ public class FriendController {
     @PostMapping("/requested")
     public String findRequestedFriendList(Model model, HttpServletRequest request) {
         HttpSession session = request.getSession();
-        Object myMemberId = session.getAttribute(SessionConst.MEMBER_ID);
-        List<FriendVo> requestedFriends = friendService.findRequestedFriend((String) myMemberId);
+        Object myId = session.getAttribute(SessionConst.ID);
+        List<Member> requestedFriends = friendService.findRequestedFriend((String) myId);
         model.addAttribute("requestedFriends", requestedFriends);
         return "friends/requestedFriendTable";
     }
@@ -117,11 +121,14 @@ public class FriendController {
      */
     @PostMapping("/requested/{friendId}")
     @ResponseBody
-    public String acceptFriend(@PathVariable String friendId, HttpServletRequest request){
+    public String acceptFriend(@PathVariable String friendId, HttpServletRequest request, HttpServletResponse response){
         HttpSession session = request.getSession();
-        Object myMemberId = session.getAttribute(SessionConst.MEMBER_ID);
+        Object myId = session.getAttribute(SessionConst.ID);
+
+        response.setContentType("text/plain");
+        response.setCharacterEncoding("UTF-8");
         try {
-            friendService.acceptFriend((String) myMemberId, friendId);
+            friendService.acceptFriend((String) myId, friendId);
             return ms.getMessage("msg.friend.acceptsuccess", null, null);
         } catch (Exception e) {
             log.info("REQUEST FRIEND FAIL: " + e);
@@ -138,8 +145,8 @@ public class FriendController {
     @GetMapping("/send")
     public String requestSendView(Model model, HttpServletRequest request) {
         HttpSession session = request.getSession();
-        Object myMemberId = session.getAttribute(SessionConst.MEMBER_ID);
-        List<FriendVo> requestSendFriends = friendService.findRequestSendFriend((String) myMemberId);
+        Object myId = session.getAttribute(SessionConst.ID);
+        List<Member> requestSendFriends = friendService.findRequestSendFriend((String) myId);
         model.addAttribute("requestSendFriends", requestSendFriends);
         return "friends/requestSendFriend";
     }
