@@ -40,4 +40,8 @@ public class Member {
     public void setUploadFile(UploadFile uploadFile) {
         this.uploadFile = uploadFile;
     }
+
+    public void setId(String id){
+        this.id = id;
+    }
 }
