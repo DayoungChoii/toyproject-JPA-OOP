@@ -1,6 +1,8 @@
 package com.dayoung.ginseng.file.service;
 
 import com.dayoung.ginseng.file.domain.UploadFile;
+import com.dayoung.ginseng.member.domain.Member;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -10,7 +12,10 @@ import java.io.IOException;
 import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 public class FileServiceImpl implements FileService{
+
+    private final FileDBService fileDBService;
 
     @Value("${file.profile.dir}")
     private String profileFileDir;
@@ -21,12 +26,18 @@ public class FileServiceImpl implements FileService{
     }
 
     @Override
-    public UploadFile storeFile(MultipartFile multipartFile) throws IOException {
+    public UploadFile storeFile(MultipartFile multipartFile, Member member) throws IOException {
         String realFileName = multipartFile.getOriginalFilename();
         String localFileName = createLocalFileName(realFileName);
         String fullPath = getFullPath(localFileName);
         multipartFile.transferTo(new File(fullPath));
-        return new UploadFile(realFileName, localFileName, fullPath);
+
+        UploadFile uploadFile = new UploadFile(realFileName, localFileName, fullPath);
+        uploadFile.setTargetId(member.getMemberId());
+
+        fileDBService.saveFile(uploadFile);
+
+        return uploadFile;
     }
 
     @Override
