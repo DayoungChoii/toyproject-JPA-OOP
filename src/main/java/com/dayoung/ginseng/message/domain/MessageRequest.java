@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
+@Table(name = "message_request")
 public class MessageRequest {
 
     @Id @GeneratedValue

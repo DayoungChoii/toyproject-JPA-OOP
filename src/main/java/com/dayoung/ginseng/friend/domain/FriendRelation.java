@@ -13,6 +13,7 @@ import java.io.Serializable;
 @Getter @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Table(name = "friend_relation")
 public class FriendRelation implements Serializable {
 
     @Id @GeneratedValue

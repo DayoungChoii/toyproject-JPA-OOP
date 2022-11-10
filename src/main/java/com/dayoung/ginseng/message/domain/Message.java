@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Getter
+@Table(name = "message")
 public class Message {
 
     @Id @GeneratedValue
