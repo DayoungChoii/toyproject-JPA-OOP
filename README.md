@@ -32,7 +32,7 @@
 - Thymleaf, Javascript, JQuery
 - Git, Gradle, Intellij, AWS, Jenkins
 
-## ByBatis -> JPA Refactoring
+## MyBatis -> JPA Refactoring
 [리팩토링 진행과정](https://velog.io/@maxxyoung/step6-mybatis-JPA-%EB%A6%AC%ED%8C%A9%ED%86%A0%EB%A7%81)
 
 ## SOLID
